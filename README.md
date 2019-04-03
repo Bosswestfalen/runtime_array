@@ -22,7 +22,7 @@ Analyze the code with `clang-tidy`.
 **Note:** make sure `clang-tidy` is installed.
 
 ## Install
-Use `cmake --build . --target install` to install WHAT to `${CMAKE_INSTALL_PREFIX}/WHERE`
+Use `cmake --build . --target install` to install `bosswestfalen/runtime_array.hpp` to `${CMAKE_INSTALL_PREFIX}/include/`
 
 ## Links
 - [bosswestfalen::runtime_array](https://github.com/Bosswestfalen/runtime_array)
