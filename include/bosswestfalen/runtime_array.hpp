@@ -15,6 +15,8 @@
 #include <iterator>
 #include <initializer_list>
 #include <memory>
+#include <stdexcept>
+#include <utility>
 
 
 /*!
@@ -48,6 +50,9 @@ class runtime_array final
 
     /// alias for T*
     using pointer = T*;
+
+    /// alias for T const *;
+    using const_pointer = T const*;
 
     /*!
      * \brief default ctor for empty array
@@ -113,27 +118,96 @@ class runtime_array final
     runtime_array& operator=(runtime_array&&) = delete;
 
     /// check for emptiness
-    [[nodiscard]] auto empty() const noexcept
+    [[nodiscard]] auto empty() const noexcept -> bool
     {
         return size() == 0;
     }
 
     /// get number of elements
-    [[nodiscard]] auto size() const noexcept
+    [[nodiscard]] auto size() const noexcept -> size_type
     {
         return m_size;
     }
 
     /// get direct access to the data
-    [[nodiscard]] auto data() noexcept
+    [[nodiscard]] auto data() const noexcept -> const_pointer
     {
         return m_data;
     }
 
-    /// get direct access to the data
-    [[nodiscard]] auto data() const noexcept
+    /// \copydoc data()
+    [[nodiscard]] auto data() noexcept -> pointer
     {
-        return m_data;
+        return const_cast<pointer>(std::as_const(*this).data());
+    }
+
+
+    /*!
+     * \brief get reference to specified element
+     *
+     * Returns a reference to the element at specified position.
+     * \note No bounds checking is performed.
+     *
+     * \param pos position of the element
+     * \return reference of the element
+     */
+    [[nodiscard]] auto operator[](size_type const pos) const -> const_reference
+    {
+        return *(data() + pos);
+    }
+
+    /// \copydoc operator[]
+    [[nodiscard]] auto operator[](size_type const pos) -> reference
+    {
+        return const_cast<reference>(std::as_const(*this)[pos]);
+    }
+
+    /*!
+     * \brief get reference to specified element
+     *
+     * Returns a reference to the element at specified position.
+     * \note Bounds checking is performed.
+     *
+     * \param pos position of the element
+     * \return reference of the element
+     */
+    [[nodiscard]] auto at(size_type const pos) const -> const_reference
+    {
+        if (size() <= pos)
+        {
+            throw std::out_of_range{""};
+        }
+        return operator[](pos);
+    }
+
+    /// \copydoc at
+    [[nodiscard]] auto at(size_type const pos) -> reference
+    {
+        return const_cast<reference>(std::as_const(*this).at(pos));
+    }
+
+    /// get reference to the first element
+    [[nodiscard]] auto front() const -> const_reference
+    {
+        return operator[](0);
+    }
+
+    /// \copydoc front
+    [[nodiscard]] auto front() -> reference
+    {
+        return const_cast<reference>(std::as_const(*this).front());
+    }
+    
+    /// get reference to the last element
+    [[nodiscard]] auto back() const -> const_reference
+    {
+        return operator[](size() - 1);
+    }
+
+    /// \copydoc back
+    [[nodiscard]] auto back() -> reference
+    {
+        return const_cast<reference>(std::as_const(*this).back());
     }
 
   private:
