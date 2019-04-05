@@ -12,6 +12,7 @@
 
 
 #include <cstddef>
+#include <iterator>
 #include <initializer_list>
 #include <memory>
 
@@ -95,7 +96,7 @@ class runtime_array final
         std::uninitialized_copy_n(il.begin(), m_size, m_data);
     }
 
-    /// release memory
+    /// destroy objects and release memory
     ~runtime_array()
     {
         std::destroy_n(m_data, m_size);
@@ -121,6 +122,18 @@ class runtime_array final
     [[nodiscard]] auto size() const noexcept
     {
         return m_size;
+    }
+
+    /// get direct access to the data
+    [[nodiscard]] auto data() noexcept
+    {
+        return m_data;
+    }
+
+    /// get direct access to the data
+    [[nodiscard]] auto data() const noexcept
+    {
+        return m_data;
     }
 
   private:
