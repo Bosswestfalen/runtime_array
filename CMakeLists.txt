@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 
 project("bosswestfalen::runtime_array"
-        VERSION 0.1.0
+        VERSION 0.2.0
         LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -68,7 +68,7 @@ if(BUILD_CODEANALYSIS)
 
     add_custom_target(codeanalysis
                       COMMAND clang-tidy
-                      -checks=*,-llvm-header-guard,-fuchsia-trailing-return
+                      -checks=*,-llvm-header-guard,-fuchsia-trailing-return,-fuchsia-overloaded-operator,-cppcoreguidelines-pro-type-const-cast
                       ${CMAKE_SOURCE_DIR}/include/bosswestfalen/runtime_array.hpp
                       -extra-arg=-std=c++17)
 endif()
