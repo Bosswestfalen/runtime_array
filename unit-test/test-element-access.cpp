@@ -7,18 +7,55 @@ using test_array = bosswestfalen::runtime_array<int>;
 
 TEST_CASE("element access of runtime_arrays", "[access]")
 {
-    SECTION("runtime_array with some elements")
+    SECTION("empty runtime_array")
     {
-        SECTION("get data")
-        {
-            SECTION("with empty array")
-            {
-                auto rta = test_array{};
-                REQUIRE(rta.data() == nullptr);
+        auto rta = test_array{};
 
-                auto const rta_c = test_array{};
-                REQUIRE(rta_c.data() == nullptr);
+        SECTION("get data ptr")
+        {
+            REQUIRE(rta.data() == nullptr);
+        }
+
+        SECTION("use at()")
+        {
+            REQUIRE_THROWS_AS(rta.at(0), std::out_of_range);
+        }
+    }
+
+
+    SECTION("non-empty runtime_array")
+    {
+        auto rta = test_array{0, 1, 2};
+
+        SECTION("get data ptr")
+        {
+            REQUIRE(rta.data() not_eq nullptr);
+        }
+
+        SECTION("get element without bounds check")
+        {
+            for (auto i = 0; i < 3; ++i)
+            {
+                REQUIRE(rta[i] == i);
             }
+        }
+
+        SECTION("get element with bounds check")
+        {
+            for (auto i = 0; i < 3; ++i)
+            {
+                REQUIRE(rta.at(i) == i);
+            }
+        }
+
+        SECTION("front")
+        {
+            REQUIRE(rta.front() == rta[0]);
+        }
+
+        SECTION("back")
+        {
+            REQUIRE(rta.back() == rta[2]);
         }
     }
 }
