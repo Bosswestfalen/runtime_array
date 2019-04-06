@@ -28,6 +28,22 @@ TEST_CASE("creation of runtime_arrays", "[create]")
             auto const rta = test_array(src.cbegin(), src.cend());
             REQUIRE(rta.empty());
         }
+
+        SECTION("copy empty runtime_array")
+        {
+            auto const src = test_array{};
+            auto const rta = src;
+            REQUIRE(rta.empty());
+        }
+
+        SECTION("move empty runtime_array")
+            {
+                auto src = test_array{};
+                auto const rta = std::move(src);
+                REQUIRE(rta.empty());
+                REQUIRE(src.empty());
+                REQUIRE(src.data() == nullptr);
+            }
     }
 
     SECTION("non-empty runtime_array")
@@ -69,6 +85,25 @@ TEST_CASE("creation of runtime_arrays", "[create]")
             auto const rta = test_array{1, 2, 3};
             REQUIRE_FALSE(rta.empty());
             REQUIRE(rta.size() == 3);
+        }
+
+        SECTION("with another runtime_array")
+        {
+            SECTION("copy construct")
+            {
+                auto const src = test_array{1, 2, 3};
+                auto const rta = src;
+                REQUIRE(rta.size() == src.size());
+            }
+
+            SECTION("move construct")
+            {
+                auto src = test_array{1, 2, 3};
+                auto const rta = std::move(src);
+                REQUIRE(rta.size() == 3);
+                REQUIRE(src.empty());
+                REQUIRE(src.data() == nullptr);
+            }
         }
     }
 }
