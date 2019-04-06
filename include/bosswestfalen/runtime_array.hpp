@@ -171,10 +171,40 @@ class runtime_array final
         orig.m_data = nullptr;
     }
 
-    /// disabled for now
-    runtime_array& operator=(runtime_array const&) = delete;
-    /// disabled for now
-    runtime_array& operator=(runtime_array&&) = delete;
+    /// copy assign
+    runtime_array& operator=(runtime_array const& rhs)
+    {
+        if (this == std::addressof(rhs))
+        {
+            return *this;
+        }
+
+        auto tmp = rhs;
+        swap(tmp);
+
+        return *this;
+    }
+
+    /// move assign
+    runtime_array& operator=(runtime_array&& rhs)
+    {
+        if (this == std::addressof(rhs))
+        {
+            return *this;
+        }
+
+        auto tmp = runtime_array{std::move(rhs)};
+        swap(tmp);
+
+        return *this;
+    }
+
+    /// swap with another runtime_array
+    void swap(runtime_array& rhs) noexcept
+    {
+        std::swap(m_size, rhs.m_size);
+        std::swap(m_data, rhs.m_data);
+    }
 
     /// check for emptiness
     [[nodiscard]] auto empty() const noexcept -> bool
@@ -353,6 +383,52 @@ class runtime_array final
     /// array of the elements
     pointer m_data{nullptr};
 };
+
+
+/// compare whether equal
+/// \todo noexcept?
+template <typename T>
+bool operator==(runtime_array<T> const& lhs, runtime_array<T> const& rhs)
+//noexcept(noexcept(T{} == T{}))
+{
+    if (lhs.size() not_eq rhs.size())
+    {
+        return false;
+    }
+
+    return std::equal(lhs.cbegin(), lhs.cend(), rhs.cbegin());
+}
+
+/// compare whether not equal
+/// \todo noexcept?
+template <typename T>
+bool operator!=(runtime_array<T> const& lhs, runtime_array<T> const& rhs)
+//noexcept(noexcept(T{} == T{}))
+{
+    return not (lhs == rhs);
+}
+
+/// check whether lhs < rhs
+/// \todo noexcept?
+template <typename T>
+bool operator<(runtime_array<T> const& lhs, runtime_array<T> const& rhs)
+//noexcept(noexcept(T{} == T{}) and noexcept(T{} != T{}) and noexcept(T{} < T{}))
+{
+    if (lhs.size() < rhs.size())
+    {
+        return true;
+    }
+
+    return std::lexicographical_compare(lhs.cbegin(), lhs.cend(), rhs.cbegin());
+}
+
+
+/// free function swap, same as runtime_array::swap
+template <typename T>
+void swap(runtime_array<T>& lhs, runtime_array<T>& rhs) noexcept
+{
+    lhs.swap(rhs);
+}
 
 } // namespace bosswestfalen
 
