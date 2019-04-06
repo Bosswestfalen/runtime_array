@@ -17,6 +17,7 @@
 #include <iterator>
 #include <memory>
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 
 
@@ -125,6 +126,25 @@ class runtime_array final
         , m_data{std::allocator<value_type>{}.allocate(m_size)}
     {
         std::uninitialized_copy_n(ptr, m_size, m_data);
+    }
+
+    /*!
+     * \brief create array and fill with range
+     *
+     * \param begin iterator to first element
+     * \param end iterator to one-past-last element
+     *
+     * \tparam I iterator type, must be at least forward iterator
+     *
+     * \note if std::distance(begin, end) is negative, behaviour is undefined
+     */
+    template <typename I,
+              typename = std::enable_if_t<std::is_base_of_v<std::forward_iterator_tag, typename std::iterator_traits<I>::iterator_category>, void*>>
+    runtime_array(I begin, I end)
+    : m_size{static_cast<size_type> (std::distance(begin, end))}
+    , m_data{std::allocator<value_type>{}.allocate(m_size)}
+    {
+        std::uninitialized_copy(begin, end, m_data);
     }
 
     /// destroy objects and release memory
