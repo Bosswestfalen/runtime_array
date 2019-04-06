@@ -21,6 +21,13 @@ TEST_CASE("creation of runtime_arrays", "[create]")
             auto const rta = test_array(nullptr, 0);
             REQUIRE(rta.empty());
         }
+
+        SECTION("empty iterator range")
+        {
+            auto const src = std::vector<int>{};
+            auto const rta = test_array(src.cbegin(), src.cend());
+            REQUIRE(rta.empty());
+        }
     }
 
     SECTION("non-empty runtime_array")
