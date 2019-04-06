@@ -1,7 +1,7 @@
 /*!
  * \file runtime_array.hpp
  * \author Bosswestfalen (https://github.com/Bosswestfalen)
- * \version 0.3.0
+ * \version 0.6.0
  * \date 2019
  * \copyright MIT License
  */
@@ -11,11 +11,13 @@
 #define BOSSWESTFALEN_RUNTIME_ARRAY_HPP_
 
 
+#include <algorithm>
 #include <cstddef>
 #include <initializer_list>
 #include <iterator>
 #include <memory>
 #include <stdexcept>
+#include <type_traits>
 #include <utility>
 
 
@@ -113,6 +115,38 @@ class runtime_array final
         std::uninitialized_copy_n(il.begin(), m_size, m_data);
     }
 
+    /*!
+     * \brief create array and fill with pointed-to elements
+     *
+     * \param ptr pointer to source data
+     * \param n number of elements to copy
+     */
+    runtime_array(const_pointer ptr, size_type const n)
+        : m_size{n}
+        , m_data{std::allocator<value_type>{}.allocate(m_size)}
+    {
+        std::uninitialized_copy_n(ptr, m_size, m_data);
+    }
+
+    /*!
+     * \brief create array and fill with range
+     *
+     * \param begin iterator to first element
+     * \param end iterator to one-past-last element
+     *
+     * \tparam I iterator type, must be at least forward iterator
+     *
+     * \note if std::distance(begin, end) is negative, behaviour is undefined
+     */
+    template <typename I,
+              typename = std::enable_if_t<std::is_base_of_v<std::forward_iterator_tag, typename std::iterator_traits<I>::iterator_category>, void*>>
+    runtime_array(I begin, I end)
+    : m_size{static_cast<size_type> (std::distance(begin, end))}
+    , m_data{std::allocator<value_type>{}.allocate(m_size)}
+    {
+        std::uninitialized_copy(begin, end, m_data);
+    }
+
     /// destroy objects and release memory
     ~runtime_array()
     {
@@ -120,14 +154,57 @@ class runtime_array final
         std::allocator<value_type>{}.deallocate(m_data, m_size);
     }
 
-    /// disabled for now
-    runtime_array(runtime_array const&) = delete;
-    /// disabled for now
-    runtime_array(runtime_array&&) = delete;
-    /// disabled for now
-    runtime_array& operator=(runtime_array const&) = delete;
-    /// disabled for now
-    runtime_array& operator=(runtime_array&&) = delete;
+    /// copy construct
+    runtime_array(runtime_array const& orig)
+        : m_size{orig.size()}
+        , m_data{std::allocator<value_type>{}.allocate(m_size)}
+    {
+        std::uninitialized_copy_n(orig.data(), size(), m_data);
+    }
+
+    /// move construct, orig will be empty
+    runtime_array(runtime_array&& orig)
+        : m_size{orig.m_size}
+    , m_data{orig.m_data}
+    {
+        orig.m_size = 0;
+        orig.m_data = nullptr;
+    }
+
+    /// copy assign
+    runtime_array& operator=(runtime_array const& rhs)
+    {
+        if (this == std::addressof(rhs))
+        {
+            return *this;
+        }
+
+        auto tmp = rhs;
+        swap(tmp);
+
+        return *this;
+    }
+
+    /// move assign
+    runtime_array& operator=(runtime_array&& rhs)
+    {
+        if (this == std::addressof(rhs))
+        {
+            return *this;
+        }
+
+        auto tmp = runtime_array{std::move(rhs)};
+        swap(tmp);
+
+        return *this;
+    }
+
+    /// swap with another runtime_array
+    void swap(runtime_array& rhs) noexcept
+    {
+        std::swap(m_size, rhs.m_size);
+        std::swap(m_data, rhs.m_data);
+    }
 
     /// check for emptiness
     [[nodiscard]] auto empty() const noexcept -> bool
@@ -293,6 +370,12 @@ class runtime_array final
         return reverse_iterator{begin()};
     }
 
+    /// assign given value to all elements
+    void fill(value_type const& val)
+    {
+        std::fill_n(data(), size(), val);
+    }
+
   private:
     /// number of elements
     size_type m_size{0};
@@ -300,6 +383,52 @@ class runtime_array final
     /// array of the elements
     pointer m_data{nullptr};
 };
+
+
+/// compare whether equal
+/// \todo noexcept?
+template <typename T>
+bool operator==(runtime_array<T> const& lhs, runtime_array<T> const& rhs)
+//noexcept(noexcept(T{} == T{}))
+{
+    if (lhs.size() not_eq rhs.size())
+    {
+        return false;
+    }
+
+    return std::equal(lhs.cbegin(), lhs.cend(), rhs.cbegin());
+}
+
+/// compare whether not equal
+/// \todo noexcept?
+template <typename T>
+bool operator!=(runtime_array<T> const& lhs, runtime_array<T> const& rhs)
+//noexcept(noexcept(T{} == T{}))
+{
+    return not (lhs == rhs);
+}
+
+/// check whether lhs < rhs
+/// \todo noexcept?
+template <typename T>
+bool operator<(runtime_array<T> const& lhs, runtime_array<T> const& rhs)
+//noexcept(noexcept(T{} == T{}) and noexcept(T{} != T{}) and noexcept(T{} < T{}))
+{
+    if (lhs.size() < rhs.size())
+    {
+        return true;
+    }
+
+    return std::lexicographical_compare(lhs.cbegin(), lhs.cend(), rhs.cbegin(), rhs.cend());
+}
+
+
+/// free function swap, same as runtime_array::swap
+template <typename T>
+void swap(runtime_array<T>& lhs, runtime_array<T>& rhs) noexcept
+{
+    lhs.swap(rhs);
+}
 
 } // namespace bosswestfalen
 
