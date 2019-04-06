@@ -154,10 +154,23 @@ class runtime_array final
         std::allocator<value_type>{}.deallocate(m_data, m_size);
     }
 
-    /// disabled for now
-    runtime_array(runtime_array const&) = delete;
-    /// disabled for now
-    runtime_array(runtime_array&&) = delete;
+    /// copy construct
+    runtime_array(runtime_array const& orig)
+        : m_size{orig.size()}
+        , m_data{std::allocator<value_type>{}.allocate(m_size)}
+    {
+        std::uninitialized_copy_n(orig.data(), size(), m_data);
+    }
+
+    /// move construct, orig will be empty
+    runtime_array(runtime_array&& orig)
+        : m_size{orig.m_size}
+    , m_data{orig.m_data}
+    {
+        orig.m_size = 0;
+        orig.m_data = nullptr;
+    }
+
     /// disabled for now
     runtime_array& operator=(runtime_array const&) = delete;
     /// disabled for now
