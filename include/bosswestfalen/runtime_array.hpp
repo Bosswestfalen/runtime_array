@@ -54,11 +54,17 @@ class runtime_array final
     /// alias for T const *;
     using const_pointer = T const*;
 
-    /// alias for T*;
+    /// alias for T*
     using iterator = T*;
 
     /// alias for T const*
     using const_iterator = T const*;
+
+    /// alias for T* for reversed iteration
+    using reverse_iterator = std::reverse_iterator<iterator>;
+
+    /// alias for T const* for reversed iteration
+    using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
     /*!
      * \brief default ctor for empty array
@@ -147,7 +153,6 @@ class runtime_array final
         return const_cast<pointer>(std::as_const(*this).data());
     }
 
-
     /*!
      * \brief get reference to specified element
      *
@@ -216,7 +221,6 @@ class runtime_array final
         return const_cast<reference>(std::as_const(*this).back());
     }
 
-
     /// get iterator to first element
     [[nodiscard]] auto cbegin() const noexcept -> const_iterator
     {
@@ -251,6 +255,42 @@ class runtime_array final
     [[nodiscard]] auto end() noexcept -> iterator
     {
         return const_cast<iterator>(std::as_const(*this).end());
+    }
+    
+    /// get reverse iterator to the last element
+    [[nodiscard]] auto crbegin() const noexcept -> const_reverse_iterator
+    {
+        return const_reverse_iterator{cend()};
+    }
+
+    /// \copydoc crbegin()
+    [[nodiscard]] auto rbegin() const noexcept -> const_reverse_iterator
+    {
+        return crbegin();
+    }
+
+    /// \dopydoc rbegin()
+    [[nodiscard]] auto rbegin() noexcept -> reverse_iterator
+    {
+        return reverse_iterator{end()};
+    }
+
+    /// get reverse iterator to the "element" before the first element
+    [[nodiscard]] auto crend() const noexcept -> const_reverse_iterator
+    {
+        return const_reverse_iterator{cbegin()};
+    }
+    
+    /// \copydoc rend()
+    [[nodiscard]] auto rend() const noexcept -> const_reverse_iterator
+    {
+        return crend();
+    }
+
+    /// \copydoc rend()
+    [[nodiscard]] auto rend() noexcept -> reverse_iterator
+    {
+        return reverse_iterator{begin()};
     }
 
   private:
