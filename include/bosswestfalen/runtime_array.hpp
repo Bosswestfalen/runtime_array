@@ -54,6 +54,12 @@ class runtime_array final
     /// alias for T const *;
     using const_pointer = T const*;
 
+    /// alias for T*;
+    using iterator = T*;
+
+    /// alias for T const*
+    using const_iterator = T const*;
+
     /*!
      * \brief default ctor for empty array
      *
@@ -208,6 +214,43 @@ class runtime_array final
     [[nodiscard]] auto back() -> reference
     {
         return const_cast<reference>(std::as_const(*this).back());
+    }
+
+
+    /// get iterator to first element
+    [[nodiscard]] auto cbegin() const noexcept -> const_iterator
+    {
+        return data();
+    }
+
+    /// \copydoc cbegin()
+    [[nodiscard]] auto begin() const noexcept -> const_iterator
+    {
+        return cbegin();
+    }
+
+    /// \dopydoc begin()
+    [[nodiscard]] auto begin() noexcept -> iterator
+    {
+        return const_cast<iterator>(std::as_const(*this).begin());
+    }
+
+    /// get iterator to the "element" following the last element
+    [[nodiscard]] auto cend() const noexcept -> const_iterator
+    {
+        return (data() + size());
+    }
+    
+    /// \copydoc end()
+    [[nodiscard]] auto end() const noexcept -> const_iterator
+    {
+        return cend();
+    }
+
+    /// \copydoc end()
+    [[nodiscard]] auto end() noexcept -> iterator
+    {
+        return const_cast<iterator>(std::as_const(*this).end());
     }
 
   private:
