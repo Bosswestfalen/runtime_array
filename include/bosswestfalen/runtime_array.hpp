@@ -11,6 +11,7 @@
 #define BOSSWESTFALEN_RUNTIME_ARRAY_HPP_
 
 
+#include <algorithm>
 #include <cstddef>
 #include <initializer_list>
 #include <iterator>
@@ -291,6 +292,12 @@ class runtime_array final
     [[nodiscard]] auto rend() noexcept -> reverse_iterator
     {
         return reverse_iterator{begin()};
+    }
+
+    /// assign given value to all elements
+    void fill(value_type const& val)
+    {
+        std::fill_n(data(), size(), val);
     }
 
   private:
