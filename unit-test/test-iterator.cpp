@@ -22,5 +22,21 @@ TEST_CASE("iterator usage", "[iterator]")
             REQUIRE(std::distance(rta.begin(), rta.end()) == Size);
         }
     }
+
+    SECTION("reverse iterators")
+    {
+        SECTION("empty runtime_array")
+        {
+            auto rta = test_array{};
+            REQUIRE(rta.rbegin() == rta.rend());
+        }
+
+        SECTION("non-empty runtime_array")
+        {
+            constexpr auto Size = 3;
+            auto const rta = test_array(Size);
+            REQUIRE(std::distance(rta.rbegin(), rta.rend()) == Size);
+        }
+    }
 }
 
