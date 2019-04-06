@@ -114,6 +114,19 @@ class runtime_array final
         std::uninitialized_copy_n(il.begin(), m_size, m_data);
     }
 
+    /*!
+     * \brief create array and fill with pointed-to elements
+     *
+     * \param ptr pointer to source data
+     * \param n number of elements to copy
+     */
+    runtime_array(const_pointer ptr, size_type const n)
+        : m_size{n}
+        , m_data{std::allocator<value_type>{}.allocate(m_size)}
+    {
+        std::uninitialized_copy_n(ptr, m_size, m_data);
+    }
+
     /// destroy objects and release memory
     ~runtime_array()
     {
