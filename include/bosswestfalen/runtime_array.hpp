@@ -1,7 +1,7 @@
 /*!
  * \file runtime_array.hpp
  * \author Bosswestfalen (https://github.com/Bosswestfalen)
- * \version 0.5.0
+ * \version 0.6.0
  * \date 2019
  * \copyright MIT License
  */
