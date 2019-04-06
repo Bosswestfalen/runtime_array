@@ -48,6 +48,13 @@ TEST_CASE("creation of runtime_arrays", "[create]")
                 auto const rta = test_array(src.data(), src.size());
                 REQUIRE(rta.size() == src.size());
             }
+
+            SECTION("with iterator pair")
+            {
+                auto const src = std::vector{1, 2, 3};
+                auto const rta = test_array(src.cbegin(), src.end());
+                REQUIRE(rta.size() == src.size());
+            }
         }
 
         SECTION("with initializer list")
