@@ -419,7 +419,7 @@ bool operator<(runtime_array<T> const& lhs, runtime_array<T> const& rhs)
         return true;
     }
 
-    return std::lexicographical_compare(lhs.cbegin(), lhs.cend(), rhs.cbegin());
+    return std::lexicographical_compare(lhs.cbegin(), lhs.cend(), rhs.cbegin(), rhs.cend());
 }
 
 
