@@ -43,11 +43,16 @@ TEST_CASE("compare", "[compare]")
 
     SECTION("less")
     {
+        auto const c = test_array{4};
+
         REQUIRE_FALSE(empty < empty);
         REQUIRE_FALSE(a < a);
+        REQUIRE_FALSE(a < b);
+        REQUIRE_FALSE(c < a);
 
         REQUIRE(empty < a);
-        REQUIRE(a < b);
+        REQUIRE(b < a);
+        REQUIRE(a < c);
     }
 }
 
