@@ -1,7 +1,7 @@
 /*!
  * \file runtime_array.hpp
  * \author Bosswestfalen (https://github.com/Bosswestfalen)
- * \version 0.6.0
+ * \version 0.6.1
  * \date 2019
  * \copyright MIT License
  */
@@ -414,11 +414,6 @@ template <typename T>
 bool operator<(runtime_array<T> const& lhs, runtime_array<T> const& rhs)
 //noexcept(noexcept(T{} == T{}) and noexcept(T{} != T{}) and noexcept(T{} < T{}))
 {
-    if (lhs.size() < rhs.size())
-    {
-        return true;
-    }
-
     return std::lexicographical_compare(lhs.cbegin(), lhs.cend(), rhs.cbegin(), rhs.cend());
 }
 
